@@ -1,0 +1,223 @@
+.ModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ModalContent {
+  position: relative;
+  background-color: white;
+  border-radius: 10px;
+  width: 813px;
+  padding: 40px 50px 60px 50px;
+}
+
+.ModalClose {
+  height: 40px;
+}
+
+.ModalClose img {
+  float: right;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  background-color: #212529;
+}
+
+.ModalTitle {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+.ModalTitle span {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  color: #212529;
+}
+
+.FormTop {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.FormTopInner {
+  width: 384px;
+}
+
+.ModalContent label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+.FormTopInner input {
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}
+.ValidationContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.ValidationContainer img {
+  width: 16px;
+  height: 16px;
+}
+
+.ValidationContainer span {
+  display: flex;
+  align-items: center;
+  font-weight: 350;
+  font-size: 10px;
+  color: #6c757d;
+}
+.ImageUpload {
+  display: none;
+}
+
+.ImageUploadButton {
+  border: 1px dashed #ced4da;
+  border-radius: 8px;
+  width: 100%;
+  height: 120px;
+  background: #ffffff;
+}
+.PreviewImageBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.PreviewImageBox span {
+  font-size: 14px;
+  line-height: 100%;
+  color: #343a40;
+}
+
+.PreviewUploaded {
+  position: relative;
+  display: flex;
+  width: 88px;
+  margin: 0 auto;
+}
+.PreviewUploadedImage {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 100px;
+}
+
+.Trash {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Trash img {
+  width: 14px;
+  height: 14px;
+}
+
+.SelectableInputContainer {
+  width: 384px;
+}
+
+.CustomDropdown {
+  position: relative;
+  width: 100%;
+}
+
+.DropdownInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.DropdownArrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #666;
+  pointer-events: none;
+}
+
+.DropdownList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0 0 4px 4px;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.DropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.DropdownItem:hover {
+  background-color: #f0f0f0;
+}
+
+.FormButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.CancelButton {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.SubmitButton {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  background: #8338ec;
+  color: white;
+}
