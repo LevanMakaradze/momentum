@@ -26,7 +26,7 @@ function Header() {
             <span>თანამშრომლის შექმნა</span>
           </button>
           
-          <NavLink to="/" style={{ textDecoration: "none" }}>
+          <NavLink to="/NewTask" style={{ textDecoration: "none" }}>
             <button className={Styles.NewTaskButton}>
               <Plus size={20} color="white" />
               <span>შექმენი ახალი დავალება</span>
