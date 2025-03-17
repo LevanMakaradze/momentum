@@ -1,0 +1,459 @@
+.taskContainer {
+    margin: 0px auto;
+    width: 100%;
+    padding: 40px 120px 0;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 200px;
+  }
+  
+  /* Loading and error states */
+  .loadingMessage,
+  .errorMessage,
+  .notFoundMessage {
+    text-align: center;
+    margin: 50px auto;
+    font-size: 18px;
+  }
+  
+  .errorMessage {
+    color: #e53935;
+  }
+  
+  /* Left column - Task details */
+  .priority1 {
+    color: #08a508;
+    border: 0.5px solid #08a508;
+    border-radius: 3px;
+    padding: 4px 5px;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  .priority1 img {
+    margin-right: 4px;
+  }
+  
+  .priority2 {
+    color: #ffbe0b;
+    border: 0.5px solid #ffbe0b;
+    border-radius: 3px;
+    padding: 4px 5px;
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .priority2 img {
+    margin-right: 4px;
+  }
+  
+  .priority3 {
+    color: #fa4d4d;
+    border: 0.5px solid #fa4d4d;
+    border-radius: 3px;
+    padding: 4px 5px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .priority3 img {
+    margin-right: 4px;
+  }
+  
+  .taskHeaderTop {
+    display: flex;
+    gap: 18px;
+  }
+  
+  .department1 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #ff66a8;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .department2 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #89b6ff;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .department3 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #ffd86d;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .department4 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #fd9a6a;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .department5 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #17f1fd;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .department6 {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #41ff0c;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+  }
+  
+  .taskDetails {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .taskHeader {
+    margin-bottom: 60px;
+  }
+  
+  .taskTitle {
+    font-family: "Inter";
+    font-weight: 600;
+    font-size: 34px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin-top: 12px;
+    color: #212529;
+  }
+  
+  .taskDescription {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: 0%;
+  }
+  
+  .taskInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 500px;
+  }
+  
+  .taskDetailsTitle {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #2a2a2a;
+  }
+  
+  .infoItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 70px;
+  }
+  
+  .infoLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+  }
+  
+  .infoValue {
+    width: 260px;
+    flex: 1;
+  }
+  
+  .employeeAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    float: left;
+    margin-right: 10px;
+  }
+  
+  .employeeTitle {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .employeeDepartment {
+    font-weight: 300;
+    font-size: 11px;
+  }
+  
+  .employeeName {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+  }
+  
+  .statusSelector {
+    width: 100%;
+  }
+  
+  .select {
+    width: 100%;
+  }
+  
+  /* Right column - Comments section */
+  .commentsSection {
+    display: flex;
+    flex-direction: column;
+    margin-top: 60px;
+    padding: 40px 45px;
+    width: 740px;
+    height: 975px;
+  }
+  
+  .commentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 18px 20px 15px 20px;
+    border: 0.3px dashed #adb5bd;
+    border-radius: 10px;
+  }
+  
+  .commentInput {
+    padding: 10px 0;
+    border: none;
+    height: 20px;
+    max-height: 100px;
+    overflow-y: hidden;
+    resize: none;
+  }
+  
+  .commentInput:active {
+    border: none;
+  }
+  
+  .commentButton {
+    align-self: flex-end;
+    padding: 8px 20px;
+    background-color: #8338ec;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .commentButton:hover {
+    background-color: #b588f4;
+  }
+  
+  .commentButton:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+  }
+  
+  .commentsTitle {
+    margin-top: 65px;
+    margin-bottom: 40px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .commentsTitle span {
+    padding: 5px;
+    border-radius: 30px;
+    width: 30px;
+    height: 22px;
+    background-color: #8338ec;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-family: FiraGO;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: white;
+  }
+  
+  .commentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: scroll;
+  }
+  
+  .commentItem {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .parentComment{
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .commentHeader {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .commentContent {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  
+  .commentAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .commentAuthor {
+    margin: 0;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 100%;
+    letter-spacing: 0%;
+  }
+  
+  .commentText {
+    margin: 0;
+    font-weight: 350;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+  }
+  
+  .replyButton {
+    color: #8338ec;
+    border: none;
+    background-color: transparent;
+    padding: 6px;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+  }
+  
+  .replyButton:hover {
+    color: #B588F4;
+  }
+  
+  .replyForm {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 18px 20px 15px 20px;
+    border: 0.3px dashed #adb5bd;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-left: 50px;
+    margin-bottom: 20px;
+  }
+  
+  .replyInput {
+    padding: 10px 0;
+    border: none;
+    height: 20px;
+    max-height: 100px;
+    overflow-y: hidden;
+    resize: none;
+  }
+  
+  .replyInput:active {
+    border: none;
+  }
+  
+  .replySubmitButton {
+    align-self: flex-end;
+    padding: 8px 20px;
+    background-color: #8338ec;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .replySubmitButton:hover {
+    background-color: #b588f4;
+  }
+  
+  .replySubmitButton:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+  }
+  
+  .subComment {
+    margin-left: 50px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }

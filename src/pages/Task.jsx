@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import styles from "./Task.module.css";
+import { ChartPie, User, Calendar, CornerUpLeft } from "lucide-react";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
@@ -209,125 +211,223 @@ const Task = () => {
     }
   };
 
-  if (loading) return <p>Loading task details...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!task) return <p>Task not found</p>;
+  const handleResize = (e) => {
+    const textarea = e.target;
+    textarea.style.height = "20px"; // Reset height to initial height
+    textarea.style.height = `${Math.min(textarea.scrollHeight - 20, 100)}px`; // Resize up to max height of 100px
+  };
+
+  if (loading)
+    return <p className={styles.loadingMessage}>Loading task details...</p>;
+  if (error) return <p className={styles.errorMessage}>Error: {error}</p>;
+  if (!task) return <p className={styles.notFoundMessage}>Task not found</p>;
 
   return (
-    <div style={{ margin: "100px auto", width: "80%" }}>
-      <h1>სათაური: {task.name}</h1>
-      <div>
-        <p>აღწერა: {task.description}</p>
-        <p>დეპარტამენტი: {task.department.name}</p>
-        <p>პრიორიტეტი: {task.priority.name}</p>
-        <div>
-          <p>სტატუსი: </p>
-          <Select
-            options={statuses}
-            value={selectedStatus}
-            onChange={handleStatusChange}
-            isDisabled={updateLoading}
-          />
-        </div>
-        <p>
-          თანამშრომელი: {task.employee.name} {task.employee.surname}
-        </p>
-        <p>{task.employee.department.name}</p>
-        <div>
-          <img
-            src={task.employee.avatar}
-            alt="avatar"
-            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-          />
-        </div>
-        <p>კომენტარები {comments.length}</p>
-        <div>
-          <form onSubmit={handleCommentSubmit} style={{ marginBottom: "20px" }}>
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              type="text"
-              placeholder="დაწერე კომენტარი"
-            />
-            <button
-              type="submit"
-              disabled={commentLoading}
-              style={{ padding: "8px 16px" }}
+    <div className={styles.taskContainer}>
+      <div className={styles.taskDetails}>
+        <div className={styles.taskHeader}>
+          <div className={styles.taskHeaderTop}>
+            <span
+              className={`${
+                task.priority.id === 1
+                  ? styles.priority1
+                  : task.priority.id === 2
+                  ? styles.priority2
+                  : task.priority.id === 3
+                  ? styles.priority3
+                  : ""
+              }`}
             >
-              დააკომენტარე
-            </button>
-          </form>
+              <img src={task.priority.icon} width="18px" height="20px" />
+              {task.priority.name}
+            </span>
+            <span
+              className={`${
+                task.department.id === 0
+                  ? styles.department0
+                  : task.department.id === 1
+                  ? styles.department1
+                  : task.department.id === 2
+                  ? styles.department2
+                  : task.department.id === 3
+                  ? styles.department3
+                  : task.department.id === 4
+                  ? styles.department4
+                  : task.department.id === 5
+                  ? styles.department5
+                  : task.department.id === 6
+                  ? styles.department6
+                  : ""
+              }`}
+            >
+              {task.department.name}
+            </span>
+          </div>
 
+          <span className={styles.taskTitle}>{task.name}</span>
+
+          <p className={styles.taskDescription}>{task.description}</p>
+        </div>
+
+        <div className={styles.taskInfo}>
+          <span className={styles.taskDetailsTitle}>დავალების დეტალები</span>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>
+              <ChartPie size="24px" />
+              სტატუსი
+            </span>
+            <div className={styles.infoValue}>
+              <div className={styles.statusSelector}>
+                <Select
+                  options={statuses}
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  isDisabled={updateLoading}
+                  className={styles.select}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>
+              <User size="24px" />
+              თანამშრომელი
+            </span>
+            <div className={styles.infoValue}>
+              <img
+                src={task.employee.avatar}
+                className={styles.employeeAvatar}
+              />
+              <div className={styles.employeeTitle}>
+                <span className={styles.employeeDepartment}>
+                  {task.employee.department.name}
+                </span>
+                <span className={styles.employeeName}>
+                  {task.employee.name} {task.employee.surname}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>
+              <Calendar size="24px" />
+              დავალების ვადა
+            </span>
+            <span className={styles.infoValue}>
+              {(() => {
+                const dateString = task.due_date; // "2025-03-13T20:00:00.000000Z"
+                const date = new Date(dateString);
+
+                const weekdays = [
+                  "კვი",
+                  "ორშ",
+                  "სამ",
+                  "ოთხ",
+                  "ხუთ",
+                  "პარ",
+                  "შაბ",
+                ];
+                const day = String(date.getUTCDate()).padStart(2, "0");
+                const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+                const year = date.getUTCFullYear();
+
+                return `${
+                  weekdays[date.getUTCDay()]
+                } - ${day}/${month}/${year}`;
+              })()}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.commentsSection}>
+        <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onInput={handleResize}
+            className={styles.commentInput}
+            placeholder="დაწერე კომენტარი"
+          />
+          <button
+            type="submit"
+            disabled={commentLoading}
+            className={styles.commentButton}
+          >
+            დააკომენტარე
+          </button>
+        </form>
+        <span className={styles.commentsTitle}>
+          კომენტარები <span>{comments.length}</span>
+        </span>
+        <div className={styles.commentsList}>
           {comments.map((comment) => (
-            <div
-              key={comment.id}
-              style={{
-                border: "1px solid black",
-                margin: "10px",
-                padding: "15px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "10px",
-                }}
-              >
+            <div key={comment.id} className={styles.commentItem}>
+
+              <div className={styles.parentComment}>
+              <div className={styles.commentAvatar}>
                 <img
                   src={comment.author_avatar}
                   alt="avatar"
-                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                  className={styles.commentAvatar}
                 />
-                <p>nick: {comment.author_nickname}</p>
               </div>
-
-              <p>{comment.text}</p>
-
-              <button
-                onClick={() =>
-                  setReplyingTo(replyingTo === comment.id ? null : comment.id)
-                }
-              >
-                {replyingTo === comment.id ? "გააუქმე პასუხი" : "უპასუხე"}
-              </button>
-
+              <div className={styles.commentContent}>
+                <p className={styles.commentAuthor}>
+                  {comment.author_nickname}
+                </p>
+                <p className={styles.commentText}>{comment.text}</p>
+                <button
+                  onClick={() =>
+                    setReplyingTo(replyingTo === comment.id ? null : comment.id)
+                  }
+                  className={styles.replyButton}
+                >
+                  <CornerUpLeft size="16px" style={{ marginRight: "6px" }} />
+                  {replyingTo === comment.id ? "გააუქმე პასუხი" : "უპასუხე"}
+                </button>
+              </div>
+              </div>
               {replyingTo === comment.id && (
-                <div>
-                  <input
+                <div className={styles.replyForm}>
+                  <textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    type="text"
+                    onInput={handleResize}
+                    className={styles.replyInput}
                     placeholder="დაწერე პასუხი"
                   />
+
                   <button
                     onClick={() => handleReplySubmit(comment.id)}
                     disabled={commentLoading}
+                    className={styles.replySubmitButton}
                   >
                     უპასუხე
                   </button>
                 </div>
               )}
+              
 
               {comment.sub_comments &&
                 comment.sub_comments.map((subComment) => (
-                  <div
-                    key={subComment.id}
-                    style={{ border: "1px solid green", margin: "15px 40px" }}
-                  >
-                    <div>
+                  <div key={subComment.id} className={styles.subComment}>
+                    <div className={styles.commentAvatar}>
                       <img
                         src={subComment.author_avatar}
                         alt="avatar"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                        }}
+                        className={styles.commentAvatar}
                       />
-                      <p>nick: {subComment.author_nickname}</p>
                     </div>
-                    <p>{subComment.text}</p>
+                    <div className={styles.commentContent}>
+                      <p className={styles.commentAuthor}>
+                        {subComment.author_nickname}
+                      </p>
+                      <p className={styles.commentText}>{subComment.text}</p>
+                    </div>
                   </div>
                 ))}
             </div>
