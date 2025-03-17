@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
@@ -34,7 +35,6 @@ const Dashboard = () => {
   const employeesRef = useRef(null);
 
   useEffect(() => {
-
     // Fetch data from the API
     const fetchData = async () => {
       try {
@@ -464,6 +464,7 @@ const Dashboard = () => {
               {filteredTasks
                 .filter((task) => task.status.id === status.id)
                 .map((task) => (
+                  <NavLink to={`/task/${task.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                   <div
                     key={task.id}
                     style={{
@@ -487,6 +488,7 @@ const Dashboard = () => {
                     />
                     <p>კომენტარები: {task.total_comments}</p>
                   </div>
+                  </NavLink>
                 ))}
             </div>
           ))}

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
 import NewTask from "./pages/NewTask";
+import Task from "./pages/Task";
 import "@fontsource/firago";
 import "@fontsource/fredoka-one";
 
@@ -28,6 +29,15 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/Task/:taskId"
+          element={
+            <>
+              <Header />
+              <Task />
+            </>
+          }
+          />
       </Routes>
     </BrowserRouter>
   );

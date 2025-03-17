@@ -19,7 +19,9 @@ function Header() {
     <>
       {/* Header */}
       <header className={Styles.Header}>
+        <NavLink to="/" style={{textDecoration:"none"}}>
         <span className={Styles.HeaderTitleText}>Momentum</span>
+        </NavLink>
         
         <div className={Styles.HeaderMenu}>
           <button className={Styles.NewEmployeeButton} onClick={openModal}>
