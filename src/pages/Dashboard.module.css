@@ -1,0 +1,177 @@
+.mainContainer {
+  margin: 40px 120px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageTitle {
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 100%;
+  color: #212529;
+  margin-bottom: 50px;
+}
+
+.filtersContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 45px;
+}
+
+.filter button {
+  height: 45px;
+  width: 200px;
+  padding: 10px 18px;
+  align-items: center;
+  border: solid 1px #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.filter span {
+  float: right;
+}
+
+.filterMenu {
+  position: absolute;
+  margin-top: 10px;
+  width: 688px;
+  height: fit-content;
+  border: 0.5px solid #8338ec;
+  border-radius: 5px;
+  padding: 40px 30px 20px 30px;
+  box-sizing: border-box;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.filterOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.filterOption {
+  display: flex;
+  gap: 15px;
+}
+.filterOption label {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0;
+}
+
+.checkBox {
+  position: relative;
+}
+
+.checkBox input[type="checkbox"] {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid #8338ec;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkBox .checkIcon {
+  position: absolute;
+
+  display: none;
+}
+
+.checkBox input[type="checkbox"]:checked + .checkIcon {
+  display: block;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8338ec;
+  pointer-events: none;
+}
+
+.filterSubmit {
+  display: inline;
+}
+.filterMenu button {
+  width: 155px;
+  border-radius: 20px;
+  padding: 8px 20px;
+  border: none;
+  background-color: #8338ec;
+  color: white;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  float: inline-end;
+}
+.checkBox input[type="radio"] {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid #8338ec;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkBox input[type="radio"]:checked + .checkIcon {
+  display: block;
+  top: 48%;
+  left: 52%;
+  transform: translate(-50%, -50%);
+  color: #8338ec;
+  pointer-events: none;
+}
+
+.selectedFilters {
+    margin: 25px 0;
+  display: flex;
+  flex-direction: row;
+  
+  gap: 8px;
+}
+
+.selectedFilter {
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 42px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap:4px;
+}
+.selectedFilter button{
+    height: 14px;
+    width: 14px;
+    border: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.filterClear{
+    padding: 6px 10px;
+    border: none;
+    border-radius: 42px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap:4px;
+    cursor: pointer;
+}

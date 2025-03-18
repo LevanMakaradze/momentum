@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { ChevronDown, Check, X } from "lucide-react";
+import styles from "./Dashboard.module.css";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
@@ -256,245 +258,199 @@ const Dashboard = () => {
     return employee ? employee.name : "";
   };
 
+  const filterData = [
+    {
+      name: "departments",
+      label: "დეპარტამენტები",
+      items: departments,
+      selectedItems: selectedFilters.departments,
+      handleSelect: handleDepartmentSelect,
+      applyFilter: applyDepartmentFilters,
+      type: "checkbox",
+    },
+    {
+      name: "priorities",
+      label: "პრიორიტეტები",
+      items: priorities,
+      selectedItems: selectedFilters.priorities,
+      handleSelect: handlePrioritySelect,
+      applyFilter: applyPriorityFilters,
+      type: "checkbox",
+    },
+    {
+      name: "employees",
+      label: "თანამშრომელი",
+      items: employees,
+      selectedItems: selectedFilters.employee,
+      handleSelect: handleEmployeeSelect,
+      applyFilter: applyEmployeeFilter,
+      type: "radio", // For selecting a single employee
+    },
+  ];
+
   return (
-    <div style={{ margin: "100px auto", width: "80%" }}>
-      <h1>ფილტრები</h1>
-      <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-        {/* Departments Dropdown */}
-        <div ref={departmentsRef} style={{ position: "relative" }}>
-          <button
-            onClick={() => toggleDropdown("departments")}
-            style={{
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              width: "200px",
-              textAlign: "left",
-            }}
-          >
-            დეპარტამენტები
-            <span style={{ float: "right" }}>▼</span>
-          </button>
-          {dropdownStates.departments && (
-            <div
-              style={{
-                position: "absolute",
-                width: "200px",
-                maxHeight: "300px",
-                overflowY: "auto",
-                border: "1px solid #ccc",
-                backgroundColor: "white",
-                zIndex: 10,
-                padding: "10px",
-              }}
-            >
-              {departments.map((dept) => (
-                <div
-                  key={dept.id}
-                  style={{ padding: "8px", cursor: "pointer" }}
-                >
-                  <input
-                    type="checkbox"
-                    id={`department-${dept.id}`}
-                    checked={selectedFilters.departments.includes(dept.id)}
-                    onChange={() => handleDepartmentSelect(dept.id)}
-                  />
-                  <label htmlFor={`department-${dept.id}`}>{dept.name}</label>
-                </div>
-              ))}
-              <button onClick={applyDepartmentFilters}>გაფილტვრა</button>
-            </div>
-          )}
-        </div>
+    <>
+      <div className={styles.mainContainer}>
+        <span className={styles.pageTitle}>დავალებების გვერდი</span>
 
-        {/* Priorities Dropdown */}
-        <div ref={prioritiesRef} style={{ position: "relative" }}>
-          <button
-            onClick={() => toggleDropdown("priorities")}
-            style={{
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              width: "200px",
-              textAlign: "left",
-            }}
-          >
-            პრიორიტეტები
-            <span style={{ float: "right" }}>▼</span>
-          </button>
-          {dropdownStates.priorities && (
+        <div className={styles.filtersContainer}>
+          {filterData.map((filter) => (
             <div
-              style={{
-                position: "absolute",
-                width: "200px",
-                maxHeight: "300px",
-                overflowY: "auto",
-                border: "1px solid #ccc",
-                backgroundColor: "white",
-                zIndex: 10,
-                padding: "10px",
-              }}
+              ref={eval(`${filter.name}Ref`)}
+              className={styles.filter}
+              key={filter.name}
             >
-              {priorities.map((priority) => (
-                <div
-                  key={priority.id}
-                  style={{ padding: "8px", cursor: "pointer" }}
-                >
-                  <input
-                    type="checkbox"
-                    id={`priority-${priority.id}`}
-                    checked={selectedFilters.priorities.includes(priority.id)}
-                    onChange={() => handlePrioritySelect(priority.id)}
-                  />
-                  <label htmlFor={`priority-${priority.id}`}>
-                    <img src={priority.icon} alt="" width="16" height="16" />{" "}
-                    {priority.name}
-                  </label>
-                </div>
-              ))}
-              <button onClick={applyPriorityFilters}>გაფილტვრა</button>
-            </div>
-          )}
-        </div>
-
-        {/* Employees Dropdown */}
-        <div ref={employeesRef} style={{ position: "relative" }}>
-          <button
-            onClick={() => toggleDropdown("employees")}
-            style={{
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              width: "200px",
-              textAlign: "left",
-            }}
-          >
-            თანამშრომელი
-            <span style={{ float: "right" }}>▼</span>
-          </button>
-          {dropdownStates.employees && (
-            <div
-              style={{
-                position: "absolute",
-                width: "200px",
-                maxHeight: "300px",
-                overflowY: "auto",
-                border: "1px solid #ccc",
-                backgroundColor: "white",
-                zIndex: 10,
-                padding: "10px",
-              }}
-            >
-              {employees.map((employee) => (
-                <div
-                  key={employee.id}
-                  style={{ padding: "8px", cursor: "pointer" }}
-                >
-                  <input
-                    type="radio"
-                    id={`employee-${employee.id}`}
-                    name="employee"
-                    checked={selectedFilters.employee === employee.id}
-                    onChange={() => handleEmployeeSelect(employee.id)}
-                  />
-                  <label htmlFor={`employee-${employee.id}`}>
-                    {employee.name}
-                  </label>
-                </div>
-              ))}
-              <button onClick={applyEmployeeFilter}>გაფილტვრა</button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Active Filters Display */}
-      {(filters.departments.length > 0 ||
-        filters.priorities.length > 0 ||
-        filters.employee) && (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-            marginBottom: "20px",
-            alignItems: "center",
-          }}
-        >
-          {filters.departments.map((deptId) => (
-            <div key={`active-dept-${deptId}`}>
-              {getDepartmentName(deptId)}
-              <button onClick={() => removeFilter("departments", deptId)}>
-                ✕
+              <button
+                onClick={() => toggleDropdown(filter.name)}
+                style={{
+                  color: dropdownStates[filter.name] ? "#8338EC" : "#0D0F10",
+                }}
+              >
+                {filter.label}
+                <span>
+                  <ChevronDown />
+                </span>
               </button>
-            </div>
-          ))}
-
-          {filters.priorities.map((priorityId) => (
-            <div key={`active-priority-${priorityId}`}>
-              {getPriorityName(priorityId)}
-              <button onClick={() => removeFilter("priorities", priorityId)}>
-                ✕
-              </button>
-            </div>
-          ))}
-
-          {filters.employee && (
-            <div>
-              {getEmployeeName(filters.employee)}
-              <button onClick={() => removeFilter("employee")}>✕</button>
-            </div>
-          )}
-
-          <button onClick={clearAllFilters}>გასუფთავება</button>
-        </div>
-      )}
-
-      {/* Filtered Tasks Display */}
-      <div style={{ marginTop: "30px" }}>
-        {loading && <p>Loading...</p>}
-        {error && <p>{error}</p>}
-        <div style={{ display: "flex", gap: "20px" }}>
-          {statuses.map((status) => (
-            <div
-              key={status.id}
-              style={{ width: "25%", height: "800px", overflowY: "scroll" }}
-            >
-              <span style={{ color: "red" }}>{status.name}</span>
-              {filteredTasks
-                .filter((task) => task.status.id === status.id)
-                .map((task) => (
-                  <NavLink to={`/task/${task.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  <div
-                    key={task.id}
-                    style={{
-                      border: "1px solid black",
-                      padding: "10px",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <h4>{task.name}</h4>
-                    <p>
-                      {task.description.length > 100
-                        ? `${task.description.substring(0, 100)}...`
-                        : task.description}
-                    </p>
-                    <p>{task.department.name}</p>
-                    <p>{task.priority.name}</p>
-                    <img
-                      src={task.employee.avatar}
-                      alt="avatar"
-                      style={{ width: "20px", height: "20px" }}
-                    />
-                    <p>კომენტარები: {task.total_comments}</p>
+              {dropdownStates[filter.name] && (
+                <div className={styles.filterMenu}>
+                  <div className={styles.filterOptions}>
+                    {filter.items.map((item) => (
+                      <div key={item.id} className={styles.filterOption}>
+                        <div className={styles.checkBox}>
+                          <input
+                            type={filter.type}
+                            id={`${filter.name}-${item.id}`}
+                            checked={
+                              filter.type === "checkbox"
+                                ? filter.selectedItems.includes(item.id)
+                                : filter.selectedItems === item.id
+                            }
+                            onChange={() => filter.handleSelect(item.id)}
+                          />
+                          <Check size={16} className={styles.checkIcon} />
+                        </div>
+                        <label
+                          htmlFor={`${filter.name}-${item.id}`}
+                          style={{ display: "flex", alignItems: "center" }}
+                        >
+                          {/* For employees, show avatar */}
+                          {filter.name === "employees" && item.avatar && (
+                            <img
+                              src={item.avatar}
+                              alt="Avatar"
+                              width="28"
+                              height="28"
+                              style={{
+                                borderRadius: "50%",
+                                marginRight: "10px",
+                              }}
+                            />
+                          )}
+                          {item.name} {item.surname}
+                        </label>
+                      </div>
+                    ))}
                   </div>
-                  </NavLink>
-                ))}
+                  <div className={styles.filterSubmit}>
+                    <button onClick={filter.applyFilter}>გაფილტვრა</button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
+
+        {/* Active Filters Display */}
+        {(filters.departments.length > 0 ||
+          filters.priorities.length > 0 ||
+          filters.employee) && (
+          <div className={styles.selectedFilters}>
+            {filters.departments.map((deptId) => (
+              <div
+                key={`active-dept-${deptId}`}
+                className={styles.selectedFilter}
+              >
+                {getDepartmentName(deptId)}
+                <button onClick={() => removeFilter("departments", deptId)}>
+                  <X size={14} style={{color:"#343A40"}}/>
+                </button>
+              </div>
+            ))}
+
+            {filters.priorities.map((priorityId) => (
+              <div
+                key={`active-priority-${priorityId}`}
+                className={styles.selectedFilter}
+              >
+                {getPriorityName(priorityId)}
+                <button onClick={() => removeFilter("priorities", priorityId)}>
+                <X size={14} style={{color:"#343A40"}}/>
+                </button>
+              </div>
+            ))}
+
+            {filters.employee && (
+              <div className={styles.selectedFilter}>
+                {getEmployeeName(filters.employee)}
+                <button onClick={() => removeFilter("employee")}>
+                <X size={14} style={{color:"#343A40"}}/>
+                </button>
+              </div>
+            )}
+
+            <button onClick={clearAllFilters} className={styles.filterClear}>გასუფთავება</button>
+          </div>
+        )}
+
+        {/* Filtered Tasks Display */}
+        <div style={{ marginTop: "30px" }}>
+          {loading && <p>Loading...</p>}
+          {error && <p>{error}</p>}
+          <div style={{ display: "flex", gap: "20px" }}>
+            {statuses.map((status) => (
+              <div
+                key={status.id}
+                style={{ width: "25%", height: "800px", overflowY: "scroll" }}
+              >
+                <span style={{ color: "red" }}>{status.name}</span>
+                {filteredTasks
+                  .filter((task) => task.status.id === status.id)
+                  .map((task) => (
+                    <NavLink
+                      to={`/task/${task.id}`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      <div
+                        key={task.id}
+                        style={{
+                          border: "1px solid black",
+                          padding: "10px",
+                          marginTop: "10px",
+                        }}
+                      >
+                        <h4>{task.name}</h4>
+                        <p>
+                          {task.description.length > 100
+                            ? `${task.description.substring(0, 100)}...`
+                            : task.description}
+                        </p>
+                        <p>{task.department.name}</p>
+                        <p>{task.priority.name}</p>
+                        <img
+                          src={task.employee.avatar}
+                          alt="avatar"
+                          style={{ width: "20px", height: "20px" }}
+                        />
+                        <p>კომენტარები: {task.total_comments}</p>
+                      </div>
+                    </NavLink>
+                  ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
