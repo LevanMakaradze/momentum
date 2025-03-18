@@ -28,8 +28,6 @@ const Dashboard = () => {
     priorities: false,
     employees: false,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // Refs for detecting outside clicks
   const departmentsRef = useRef(null);
@@ -40,8 +38,6 @@ const Dashboard = () => {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        setLoading(true);
-
         // Fetch statuses
         const statusesRes = await fetch(
           "https://momentum.redberryinternship.ge/api/statuses"
@@ -89,9 +85,7 @@ const Dashboard = () => {
         setTasks(tasksData);
         setFilteredTasks(tasksData);
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        console.error(err);
       }
     };
 
@@ -292,7 +286,7 @@ const Dashboard = () => {
     1: "#F7BC30", // Yellow
     2: "#FB5607", // Orange
     3: "#FF006E", // Pink
-    4: "#FF006E", // Blue
+    4: "#3A86FF", // Blue
   };
 
   const priorityColors = {
@@ -433,9 +427,6 @@ const Dashboard = () => {
 
         {/* Filtered Tasks Display */}
         <div>
-          {loading && <p>Loading...</p>}
-          {error && <p>{error}</p>}
-
           <div className={styles.tasksContainer}>
             {statuses.map((status) => (
               <div key={status.id} className={styles.tasksColumns}>
@@ -453,7 +444,11 @@ const Dashboard = () => {
                       to={`/task/${task.id}`}
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
-                      <div key={task.id} className={styles.taskCard}>
+                      <div
+                        key={task.id}
+                        className={styles.taskCard}
+                        style={{ borderColor: statusColors[status.id] }}
+                      >
                         <div className={styles.taskCardTop}>
                           <div className={styles.taskCardTopLeft}>
                             <span
@@ -516,9 +511,11 @@ const Dashboard = () => {
                         <div className={styles.taskCardMiddle}>
                           <span className={styles.taskTitle}>{task.name}</span>
                           <p className={styles.taskDescription}>
-                            {task.description.length > 100
-                              ? `${task.description.substring(0, 100)}...`
-                              : task.description}
+                            {task.description
+                              ? task.description.length > 100
+                                ? `${task.description.substring(0, 100)}...`
+                                : task.description
+                              : ""}
                           </p>
                         </div>
 

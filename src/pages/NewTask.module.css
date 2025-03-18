@@ -1,0 +1,137 @@
+.title {
+  margin: 40px 0 25px 120px;
+}
+
+.title span {
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.newTaskContainer {
+  margin: 0 120px;
+  padding: 65px 55px;
+}
+
+.formInputContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 160px;
+}
+
+.leftColumn {
+  width: 550px;
+  display: flex;
+  flex-direction: column;
+  gap: 55px;
+}
+
+.bottomContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.inputItem {
+  display: flex;
+  flex-direction: column;
+}
+.inputItem label {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #343a40;
+  padding: 6px 0;
+}
+.inputItem input {
+  height: 42px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}
+.inputItem textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  height: 133px;
+  resize: none;
+}
+.validation {
+  display: flex;
+  flex-direction: column;
+  padding: 1px 0;
+  gap: 2px;
+}
+.validation p {
+  color: #6c757d;
+  margin: 0;
+  font-weight: 350;
+  font-size: 10px;
+  line-height: 100%;
+  letter-spacing: 0%;
+}
+
+.bottomContainer .inputItem {
+  width: 260px;
+}
+
+.rightColumn {
+  width: 550px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rightTop .inputItem {
+  height: 116px;
+}
+
+.rightTop {
+  display: flex;
+  flex-direction: column;
+  gap: 55px;
+}
+.dateContainer {
+  margin-top: auto;
+  margin-bottom: 0;
+  padding: 0;
+}
+.dateContainer .inputItem {
+  width: 320px;
+}
+.datePicker {
+  width: 500px;
+}
+
+.submit{
+    margin-top: 150px;
+    width: 1260px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+.submit button {
+  border-radius: 5px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #8338ec;
+  color: white;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  cursor: pointer;
+  transition: all 300ms ease-out;
+}
+
+.submit button:hover{
+    background-color: #B588F4;
+}
+
+.submit button:disabled{
+    background-color: grey;
+    opacity: 50%;
+    cursor: not-allowed;
+}
+

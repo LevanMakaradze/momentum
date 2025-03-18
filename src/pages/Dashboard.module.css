@@ -182,11 +182,11 @@
 .tasksContainer {
   display: flex;
   gap: 50px;
+  padding-bottom: 50px;
 }
 
 .tasksColumns {
   width: 25%;
-  height: 800px;
   gap: 30px;
   display: flex;
   flex-direction: column;
@@ -207,7 +207,7 @@
 }
 
 .taskCard {
-  border: 1px solid #f7bc30;
+  border: 1px solid;
   border-radius: 15px;
   padding: 20px;
   display: flex;

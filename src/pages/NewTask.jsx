@@ -4,7 +4,9 @@ import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import styles from "./NewTask.module.css";
+import { Calendar } from "lucide-react";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
@@ -19,6 +21,8 @@ const NewTask = ({ submitTask }) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  // Track the previous department to detect changes
+  const [previousDepartment, setPreviousDepartment] = useState(null);
 
   // Initialize the form
   const {
@@ -28,7 +32,8 @@ const NewTask = ({ submitTask }) => {
     setValue,
     watch,
     reset,
-    formState: { errors, isValid, dirtyFields},
+    trigger, // Add trigger to manually validate fields
+    formState: { errors, isValid, dirtyFields },
   } = useForm({
     mode: "onChange",
   });
@@ -41,33 +46,54 @@ const NewTask = ({ submitTask }) => {
 
   // Load form data from localStorage
   useEffect(() => {
-    const savedFormData = localStorage.getItem('taskFormData');
-    if (savedFormData) {
-      const parsedData = JSON.parse(savedFormData);
-      
-      // Set form values from localStorage
-      Object.keys(parsedData).forEach(key => {
-        // Special handling for date objects
-        if (key === 'deadline' && parsedData[key]) {
-          setValue(key, new Date(parsedData[key]));
-        } else {
-          setValue(key, parsedData[key]);
-        }
-      });
+    const savedFormData = localStorage.getItem("taskFormData");
+    const parsedData = savedFormData ? JSON.parse(savedFormData) : {};
+
+    // Set form values from localStorage for fields that exist
+    Object.keys(parsedData).forEach((key) => {
+      // Special handling for date objects
+      if (key === "deadline" && parsedData[key]) {
+        setValue(key, new Date(parsedData[key]));
+      } else if (parsedData[key]) {
+        setValue(key, parsedData[key]);
+      }
+    });
+
+    // Apply default values for fields that don't exist in localStorage
+
+    // Set default priority if not in localStorage
+    if (!parsedData.priority) {
+      const defaultPriority =
+        priorities.find((p) => p.label === "საშუალო") ||
+        (priorities.length > 0 ? priorities[0] : null);
+      if (defaultPriority) setValue("priority", defaultPriority);
     }
-  }, [setValue]);
+
+    // Set default status if not in localStorage
+    if (!parsedData.status) {
+      const defaultStatus =
+        statuses.find((s) => s.label === "დასაწყები") ||
+        (statuses.length > 0 ? statuses[0] : null);
+      if (defaultStatus) setValue("status", defaultStatus);
+    }
+
+    // Set default deadline to tomorrow if not in localStorage
+    if (!parsedData.deadline) {
+      setValue("deadline", new Date(Date.now() + 24 * 60 * 60 * 1000));
+    }
+  }, [setValue, priorities, statuses]);
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
     if (!loading && Object.keys(watchedFields).length > 0) {
       const formDataToSave = { ...watchedFields };
-      
+
       // Convert date object to string for storage
       if (formDataToSave.deadline instanceof Date) {
         formDataToSave.deadline = formDataToSave.deadline.toISOString();
       }
-      
-      localStorage.setItem('taskFormData', JSON.stringify(formDataToSave));
+
+      localStorage.setItem("taskFormData", JSON.stringify(formDataToSave));
     }
   }, [watchedFields, loading]);
 
@@ -109,29 +135,44 @@ const NewTask = ({ submitTask }) => {
         );
         setDepartments(formattedDepartments);
 
-        // Check if we already have saved data
-        const savedFormData = localStorage.getItem('taskFormData');
-        
-        // Only set defaults if there's no saved data
-        if (!savedFormData) {
-          // Set default priority
-          if (formattedPriorities.length > 0) {
-            const mediumPriority =
-              formattedPriorities.find((p) => p.label === "საშუალო") ||
-              formattedPriorities[0];
-            setValue("priority", mediumPriority);
-          }
+        // Get saved form data
+        const savedFormData = localStorage.getItem("taskFormData");
+        const parsedData = savedFormData ? JSON.parse(savedFormData) : {};
 
-          // Set default status
-          if (formattedStatuses.length > 0) {
-            const startStatus =
-              formattedStatuses.find((s) => s.label === "დასაწყები") ||
-              formattedStatuses[0];
-            setValue("status", startStatus);
+        // Apply saved values first if they exist
+        Object.keys(parsedData).forEach((key) => {
+          // Special handling for date objects
+          if (key === "deadline" && parsedData[key]) {
+            setValue(key, new Date(parsedData[key]));
+          } else if (parsedData[key]) {
+            setValue(key, parsedData[key]);
           }
+        });
 
-          // Set default deadline to tomorrow
+        // Set default priority if not in localStorage
+        if (!parsedData.priority && formattedPriorities.length > 0) {
+          const mediumPriority =
+            formattedPriorities.find((p) => p.label === "საშუალო") ||
+            formattedPriorities[0];
+          setValue("priority", mediumPriority);
+        }
+
+        // Set default status if not in localStorage
+        if (!parsedData.status && formattedStatuses.length > 0) {
+          const startStatus =
+            formattedStatuses.find((s) => s.label === "დასაწყები") ||
+            formattedStatuses[0];
+          setValue("status", startStatus);
+        }
+
+        // Set default deadline if not in localStorage
+        if (!parsedData.deadline) {
           setValue("deadline", new Date(Date.now() + 24 * 60 * 60 * 1000));
+        }
+
+        // Initialize previousDepartment with saved value
+        if (parsedData.department) {
+          setPreviousDepartment(parsedData.department);
         }
 
         setLoading(false);
@@ -144,6 +185,35 @@ const NewTask = ({ submitTask }) => {
 
     fetchData();
   }, [setValue]);
+
+  // Handle department changes to reset employee selection
+  useEffect(() => {
+    // Skip if loading or no department selected
+    if (loading || !selectedDepartment) return;
+
+    // Check if department has changed
+    if (
+      previousDepartment &&
+      selectedDepartment.value !== previousDepartment.value
+    ) {
+      // Clear employee when department changes
+      setValue("employee", null);
+
+      // Update localStorage to remove employee
+      const savedFormData = localStorage.getItem("taskFormData");
+      if (savedFormData) {
+        const parsedData = JSON.parse(savedFormData);
+        parsedData.employee = null;
+        localStorage.setItem("taskFormData", JSON.stringify(parsedData));
+      }
+
+      // Re-validate form
+      trigger("employee");
+    }
+
+    // Update previous department reference
+    setPreviousDepartment(selectedDepartment);
+  }, [selectedDepartment, previousDepartment, setValue, loading, trigger]);
 
   // Fetch employees when department changes
   useEffect(() => {
@@ -171,17 +241,6 @@ const NewTask = ({ submitTask }) => {
           }));
 
           setEmployees(formattedEmployees);
-
-          // Only clear employee if we don't have saved data for this department
-          const savedFormData = localStorage.getItem('taskFormData');
-          const parsedData = savedFormData ? JSON.parse(savedFormData) : null;
-          
-          // If we don't have a saved employee or the department has changed, reset employee
-          if (!parsedData?.employee || 
-              (parsedData.department && 
-              parsedData.department.value !== selectedDepartment.value)) {
-            setValue("employee", null);
-          }
         } catch (err) {
           console.error("Error fetching employees:", err);
         }
@@ -207,16 +266,23 @@ const NewTask = ({ submitTask }) => {
       return watchedFields[field] !== undefined && !errors[field];
     });
 
+    // Additional validation for employee field
+    const isEmployeeValid =
+      !selectedDepartment ||
+      (selectedDepartment &&
+        watchedFields.employee &&
+        watchedFields.employee.value !== undefined);
+
     // If description is filled, check it meets the validation
+    let isDescriptionValid = true;
     if (watchedFields.description && watchedFields.description.trim() !== "") {
       const words = watchedFields.description.trim().split(/\s+/);
       if (words.length < 4) {
-        setFormIsValid(false);
-        return;
+        isDescriptionValid = false;
       }
     }
 
-    setFormIsValid(allFieldsValid);
+    setFormIsValid(allFieldsValid && isEmployeeValid && isDescriptionValid);
   }, [watchedFields, errors, selectedDepartment, loading]);
 
   const onSubmit = async (data) => {
@@ -248,200 +314,305 @@ const NewTask = ({ submitTask }) => {
       );
 
       setSubmitSuccess(true);
-      
+
       // Clear form data from localStorage
-      localStorage.removeItem('taskFormData');
-      
+      localStorage.removeItem("taskFormData");
+
       // Reset the form
       reset();
-      
-      // Navigate to home page
-      navigate('/');
 
+      navigate("/");
     } catch (err) {
       console.error("Error submitting task:", err);
       setSubmitError("Failed to submit task. Please try again.");
-    } finally {
       setSubmitLoading(false);
     }
   };
 
-  const getValidationMessageColor = (fieldName) => {
-    // If the field has an error, return red
-    if (errors[fieldName]) {
-      return "red";
+  const getValidationMessageColor = (fieldName, validationType) => {
+    const fieldValue = watchedFields[fieldName];
+
+    // Handle minimum validation
+    if (validationType === "min") {
+      if (fieldName === "title") {
+        if (!fieldValue) return "#6c757d";
+        return fieldValue.length >= 3 ? "green" : "red";
+      }
+      if (fieldName === "description") {
+        if (!fieldValue || !fieldValue.trim()) return "#6c757d";
+        const words = fieldValue.trim().split(/\s+/);
+        return words.length >= 4 ? "green" : "red";
+      }
     }
-    // If the field is dirty (has been changed) or touched (has been focused) and has no errors, return green
-    else if (dirtyFields[fieldName] && !errors[fieldName]) {
-      return "green";
+
+    // Handle maximum validation
+    if (validationType === "max") {
+      if (!fieldValue) return "#6c757d";
+      return fieldValue.length <= 255 ? "green" : "red";
     }
-    // Otherwise return grey (default state)
-    else {
-      return "grey";
+
+    return "#6c757d";
+  };
+
+  const getInputBorderColor = (fieldName) => {
+    const fieldValue = watchedFields[fieldName];
+
+    // If field is empty, return default border
+    if (!fieldValue) return "";
+
+    if (fieldName === "title") {
+      // Both validations must be true for green border
+      const isMinValid = fieldValue.length >= 3;
+      const isMaxValid = fieldValue.length <= 255;
+      return isMinValid && isMaxValid ? "green" : "red";
     }
+
+    if (fieldName === "description") {
+      // If empty, it's valid
+      if (!fieldValue.trim()) return "";
+
+      // Both validations must be true for green border
+      const words = fieldValue.trim().split(/\s+/);
+      const isMinValid = words.length >= 4;
+      const isMaxValid = fieldValue.length <= 255;
+      return isMinValid && isMaxValid ? "green" : "red";
+    }
+
+    return "";
+  };
+
+  const CustomDatePickerInput = ({ value, onClick }) => {
+    return (
+      <div style={{ position: 'relative' }}>
+        <Calendar
+          size={18}
+          style={{
+            position: 'absolute',
+            left: '10px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 1,
+            pointerEvents: 'none', // Ensures it doesn't block the input field
+          }}
+        />
+        <input
+          value={value}
+          onClick={onClick}
+          style={{
+            padding:'5px 0 5px 35px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+          }}
+        />
+      </div>
+    );
   };
 
   return (
-    <div>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      {submitError && <div style={{ color: "red" }}>{submitError}</div>}
-      {submitSuccess && (
-        <div style={{ color: "green" }}>Task submitted successfully!</div>
-      )}
+    <>
+      <div className={styles.title}>
+        <span>შექმენი ახალი დავალება</span>
+      </div>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{ width: "50%", margin: "100px auto" }}
-      >
-        <div>
-          <label>სათაური*</label>
-          <input
-            {...register("title", {
-              required: true,
-              minLength: 3,
-              maxLength: 255,
-            })}
-            type="text"
-          />
-          <p style={{ color: getValidationMessageColor("title") }}>
-            მინიმუმ 3 და მაქსიმუმ 255 სიმბოლო
-          </p>
-        </div>
+      <div className={styles.newTaskContainer}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className={styles.formInputContainer}>
+            <div className={styles.leftColumn}>
+              <div className={styles.inputItem}>
+                <label>სათაური*</label>
+                <input
+                  {...register("title", {
+                    required: true,
+                    minLength: 3,
+                    maxLength: 255,
+                  })}
+                  type="text"
+                  style={{ borderColor: getInputBorderColor("title") }}
+                />
+                <div className={styles.validation}>
+                  <p
+                    style={{ color: getValidationMessageColor("title", "min") }}
+                  >
+                    მინიმუმ 2 სიმბოლო
+                  </p>
+                  <p
+                    style={{ color: getValidationMessageColor("title", "max") }}
+                  >
+                    მაქსიმუმ 255 სიმბოლო
+                  </p>
+                </div>
+              </div>
 
-        <div>
-          <label>აღწერა</label>
-          <textarea
-            style={{ height: "100px", width: "100%", resize: "none" }}
-            {...register("description", {
-              validate: (value) => {
-                // Allow empty description
-                if (!value || value.trim() === "") return true;
+              <div className={styles.inputItem}>
+                <label>აღწერა</label>
+                <textarea
+                  {...register("description", {
+                    validate: (value) => {
+                      // Allow empty description
+                      if (!value || value.trim() === "") return true;
 
-                // Remove spaces and check for 4+ words
-                const words = value.trim().split(/\s+/);
-                return words.length >= 4;
-              },
-              maxLength: 255,
-            })}
-          />
-          <p style={{ color: getValidationMessageColor("description") }}>
-            მინიმუმ 4 სიტყვა და მაქსიმუმ 255 სიმბოლო
-          </p>
-        </div>
-
-        <div>
-          <label>პრიორიტეტი*</label>
-          <Controller
-            name="priority"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={priorities}
-                formatOptionLabel={(option) => (
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    {option.icon && (
-                      <img
-                        src={option.icon}
-                        alt="priority icon"
-                        width="20"
-                        style={{ marginRight: 10 }}
+                      // Remove spaces and check for 4+ words
+                      const words = value.trim().split(/\s+/);
+                      return words.length >= 4;
+                    },
+                    maxLength: 255,
+                  })}
+                  style={{ borderColor: getInputBorderColor("description") }}
+                />
+                <div className={styles.validation}>
+                  <p
+                    style={{
+                      color: getValidationMessageColor("description", "min"),
+                    }}
+                  >
+                    მინიმუმ 4 სიტყვა
+                  </p>
+                  <p
+                    style={{
+                      color: getValidationMessageColor("description", "max"),
+                    }}
+                  >
+                    მაქსიმუმ 255 სიმბოლო
+                  </p>
+                </div>
+              </div>
+              <div className={styles.bottomContainer}>
+                <div className={styles.inputItem}>
+                  <label>პრიორიტეტი*</label>
+                  <Controller
+                    name="priority"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={priorities}
+                        formatOptionLabel={(option) => (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            {option.icon && (
+                              <img
+                                src={option.icon}
+                                alt="priority icon"
+                                width="20"
+                                style={{ marginRight: 10 }}
+                              />
+                            )}
+                            {option.label}
+                          </div>
+                        )}
+                        placeholder=""
                       />
                     )}
-                    {option.label}
-                  </div>
-                )}
-                placeholder=""
-              />
-            )}
-          />
-        </div>
-
-        <div>
-          <label>სტატუსი*</label>
-          <Controller
-            name="status"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select {...field} options={statuses} placeholder="" />
-            )}
-          />
-        </div>
-
-        <div>
-          <label>დეპარტამენტი*</label>
-          <Controller
-            name="department"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select {...field} options={departments} placeholder="" />
-            )}
-          />
-        </div>
-
-        {selectedDepartment && (
-          <div>
-            <label>პასუხისმგებელი თანამშრომელი*</label>
-            <Controller
-              name="employee"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  options={employees}
-                  getOptionLabel={(e) => (
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      {e.avatar && (
-                        <img
-                          src={e.avatar}
-                          alt="avatar"
-                          width="20"
-                          style={{ marginRight: "10px", borderRadius: "50%" }}
+                  />
+                </div>
+                <div className={styles.inputItem}>
+                  <label>სტატუსი*</label>
+                  <Controller
+                    name="status"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select {...field} options={statuses} placeholder="" />
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className={styles.rightColumn}>
+              <div className={styles.rightTop}>
+                <div className={styles.inputItem}>
+                  <label>დეპარტამენტი*</label>
+                  <Controller
+                    name="department"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select {...field} options={departments} placeholder="" />
+                    )}
+                  />
+                </div>
+                {selectedDepartment && (
+                  <div className={styles.inputItem}>
+                    <label>პასუხისმგებელი თანამშრომელი*</label>
+                    <Controller
+                      name="employee"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          options={employees}
+                          getOptionLabel={(e) => (
+                            <div
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              {e.avatar && (
+                                <img
+                                  src={e.avatar}
+                                  alt="avatar"
+                                  width="20"
+                                  style={{
+                                    marginRight: "10px",
+                                    borderRadius: "50%",
+                                  }}
+                                />
+                              )}
+                              {e.label}
+                            </div>
+                          )}
+                          placeholder={
+                            employees.length > 0
+                              ? ""
+                              : "თანამშრომლები არ მოიძებნა"
+                          }
+                          isDisabled={employees.length === 0}
                         />
                       )}
-                      {e.label}
-                    </div>
-                  )}
-                  placeholder={
-                    employees.length > 0 ? "" : "თანამშრომლები არ მოიძებნა"
-                  }
-                  isDisabled={employees.length === 0}
-                />
-              )}
-            />
+                    />
+                  </div>
+                )}
+              </div>
+              <div className={styles.dateContainer}>
+                <div className={styles.inputItem}>
+                  <label>დედლაინი</label>
+
+
+                  <Controller
+    name="deadline"
+    control={control}
+    rules={{ required: true }}
+    render={({ field }) => (
+      <DatePicker
+        {...field}
+        selected={field.value}
+        onChange={(date) => setValue('deadline', date)}
+        minDate={new Date()}
+        dateFormat="dd.MM.yyyy"
+        customInput={<CustomDatePickerInput />} // Use custom input component
+      />
+    )}
+  />
+
+
+
+
+
+
+                </div>
+              </div>
+            </div>
           </div>
-        )}
 
-        <div>
-          <label>დედლაინი</label>
-          <Controller
-            name="deadline"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <DatePicker
-                {...field}
-                selected={field.value}
-                onChange={(date) => setValue("deadline", date)}
-                minDate={new Date()}
-                dateFormat="dd.MM.yyyy"
-              />
-            )}
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={!(isValid && formIsValid) || submitLoading}
-        >
-          {submitLoading ? "გთხოვთ მოიცადოთ..." : "დამატება"}
-        </button>
-      </form>
-    </div>
+          <div className={styles.submit}>
+            <button type="submit" disabled={!(isValid && formIsValid)}>
+              დავალების შექმნა
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 
