@@ -37,6 +37,7 @@
   margin-top: 10px;
   width: 688px;
   height: fit-content;
+  max-height: 550px;
   border: 0.5px solid #8338ec;
   border-radius: 5px;
   padding: 40px 30px 20px 30px;
@@ -51,6 +52,7 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
+  overflow-y: auto;
 }
 
 .filterOption {

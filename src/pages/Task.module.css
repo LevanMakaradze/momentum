@@ -1,72 +1,26 @@
 .taskContainer {
     margin: 0px auto;
-    width: 100%;
     padding: 40px 120px 0;
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 200px;
+    display: flex;
+    flex-direction: row;
   }
   
-  /* Loading and error states */
-  .loadingMessage,
-  .errorMessage,
-  .notFoundMessage {
-    text-align: center;
-    margin: 50px auto;
-    font-size: 18px;
-  }
-  
-  .errorMessage {
-    color: #e53935;
-  }
   
   /* Left column - Task details */
-  .priority1 {
-    color: #08a508;
-    border: 0.5px solid #08a508;
-    border-radius: 3px;
-    padding: 4px 5px;
-    font-weight: 500;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  .priority1 img {
-    margin-right: 4px;
-  }
-  
-  .priority2 {
-    color: #ffbe0b;
-    border: 0.5px solid #ffbe0b;
-    border-radius: 3px;
-    padding: 4px 5px;
-    font-weight: 500;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  
-  .priority2 img {
-    margin-right: 4px;
-  }
-  
-  .priority3 {
-    color: #fa4d4d;
-    border: 0.5px solid #fa4d4d;
+  .priority {
+    border: 0.5px solid;
     border-radius: 3px;
     padding: 4px 5px;
     font-weight: 500;
     font-size: 16px;
     line-height: 150%;
+    letter-spacing: 0;
     display: flex;
     align-items: center;
     width: fit-content;
   }
-  
-  .priority3 img {
+  .priority img {
     margin-right: 4px;
   }
   
@@ -75,10 +29,9 @@
     gap: 18px;
   }
   
-  .department1 {
+  .department {
     padding: 5px 10px;
     border-radius: 15px;
-    background-color: #ff66a8;
     font-weight: 400;
     font-size: 16px;
     line-height: 100%;
@@ -87,88 +40,26 @@
     align-items: center;
     width: fit-content;
   }
-  
-  .department2 {
-    padding: 5px 10px;
-    border-radius: 15px;
-    background-color: #89b6ff;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  
-  .department3 {
-    padding: 5px 10px;
-    border-radius: 15px;
-    background-color: #ffd86d;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  
-  .department4 {
-    padding: 5px 10px;
-    border-radius: 15px;
-    background-color: #fd9a6a;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  
-  .department5 {
-    padding: 5px 10px;
-    border-radius: 15px;
-    background-color: #17f1fd;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
-  
-  .department6 {
-    padding: 5px 10px;
-    border-radius: 15px;
-    background-color: #e14704;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    width: fit-content;
-  }
+
   
   .taskDetails {
     display: flex;
     flex-direction: column;
+    max-width: 715px;
   }
   
   .taskHeader {
     margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .taskTitle {
-    font-family: "Inter";
     font-weight: 600;
     font-size: 34px;
     line-height: 100%;
     letter-spacing: 0%;
-    margin-top: 12px;
     color: #212529;
   }
   
@@ -199,6 +90,8 @@
     flex-direction: row;
     align-items: center;
     gap: 70px;
+
+
   }
   
   .infoLabel {
@@ -206,11 +99,21 @@
     align-items: center;
     gap: 8px;
     min-width: 150px;
+
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    color: #474747;
   }
   
   .infoValue {
     width: 260px;
-    flex: 1;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    color:#0D0F10;
   }
   
   .employeeAvatar {
@@ -229,12 +132,17 @@
   .employeeDepartment {
     font-weight: 300;
     font-size: 11px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color:#474747;
   }
   
   .employeeName {
     font-weight: 400;
     font-size: 14px;
     line-height: 150%;
+    letter-spacing: 0%;
+    color:#0D0F10;
   }
   
   .statusSelector {
@@ -245,6 +153,12 @@
     width: 100%;
   }
   
+  .commentsContainer{
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+  }
+
   /* Right column - Comments section */
   .commentsSection {
     display: flex;
@@ -331,7 +245,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
   
   .commentItem {

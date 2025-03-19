@@ -13,85 +13,70 @@ const Task = () => {
   const [statuses, setStatuses] = useState([]);
   const [comments, setComments] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // fetch task,statusses and comments(get requests)
+  // fetch task, statuses and comments(get requests)
   useEffect(() => {
-    const fetchTask = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        setLoading(true);
-        const response = await axios.get(
+        // Fetch task data
+        const taskResponse = await axios.get(
           `https://momentum.redberryinternship.ge/api/tasks/${taskId}`,
           {
             headers: { Authorization: `Bearer ${API_TOKEN}` },
           }
         );
-        setTask(response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    const fetchStatus = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
+        // Fetch statuses
+        const statusResponse = await axios.get(
           `https://momentum.redberryinternship.ge/api/statuses`
         );
 
-        const formattedStatuses = response.data.map((status) => ({
-          value: status.id,
-          label: status.name,
-        }));
-        setStatuses(formattedStatuses);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchComments = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
+        // Fetch comments
+        const commentsResponse = await axios.get(
           `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
           {
             headers: { Authorization: `Bearer ${API_TOKEN}` },
           }
         );
-        setComments(response.data);
+
+        // Update state with fetched data
+        setTask(taskResponse.data);
+
+        const formattedStatuses = statusResponse.data.map((status) => ({
+          value: status.id,
+          label: status.name,
+        }));
+        setStatuses(formattedStatuses);
+
+        setComments(commentsResponse.data);
+
+        // Set the initial selected status
+        if (taskResponse.data && formattedStatuses.length > 0) {
+          const currentStatus = formattedStatuses.find(
+            (status) => status.value === taskResponse.data.status.id
+          );
+          if (currentStatus) {
+            setSelectedStatus(currentStatus);
+          }
+        }
       } catch (err) {
-        setError(err.message);
+        console.error("Error loading task data:", err);
+        setError("Failed to load task data. Please refresh the page.");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchTask();
-    fetchStatus();
-    fetchComments();
+    fetchData();
   }, [taskId]);
-
-  // set the default selected status
-  useEffect(() => {
-    if (task && statuses.length > 0) {
-      const currentStatus = statuses.find(
-        (status) => status.value === task.status.id
-      );
-      if (currentStatus) {
-        setSelectedStatus(currentStatus);
-      }
-    }
-  }, [task, statuses]);
 
   // update task status (put request)
   const updateTaskStatus = async (newStatus) => {
@@ -119,7 +104,6 @@ const Task = () => {
 
       alert("სტატუსი წარმატებით შეიცვალა");
     } catch (err) {
-      setError(`Failed to update status: ${err.message}`);
       alert("სტატუსი ვერ შეიცვალა");
     } finally {
       setUpdateLoading(false);
@@ -143,7 +127,7 @@ const Task = () => {
     try {
       setCommentLoading(true);
 
-      const response = await axios.post(
+      await axios.post(
         `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
         {
           text: newComment,
@@ -161,11 +145,11 @@ const Task = () => {
         }
       );
 
+      alert("კომენტარი წარმატებით დაემატა!");
       setComments(commentsResponse.data);
       setNewComment(""); // clear input field
     } catch (err) {
-      setError(`Failed to post comment: ${err.message}`);
-      alert("Failed to post comment");
+      alert("კომენტარი ვერ დაემატა!");
     } finally {
       setCommentLoading(false);
     }
@@ -181,7 +165,7 @@ const Task = () => {
     try {
       setCommentLoading(true);
 
-      const response = await axios.post(
+      await axios.post(
         `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
         {
           text: replyText,
@@ -199,13 +183,13 @@ const Task = () => {
           headers: { Authorization: `Bearer ${API_TOKEN}` },
         }
       );
-
+      alert("პასუხი წარმატებით დაემატა!");
       setComments(commentsResponse.data);
       setReplyText(""); // Clear reply input
       setReplyingTo(null); // Hide reply form
     } catch (err) {
-      setError(`Failed to post reply: ${err.message}`);
-      alert("Failed to post reply");
+      console.error(err);
+      alert("პასუხი ვერ დაემატა!");
     } finally {
       setCommentLoading(false);
     }
@@ -217,10 +201,36 @@ const Task = () => {
     textarea.style.height = `${Math.min(textarea.scrollHeight - 20, 100)}px`; // Resize up to max height of 100px
   };
 
-  if (loading)
-    return <p className={styles.loadingMessage}>Loading task details...</p>;
-  if (error) return <p className={styles.errorMessage}>Error: {error}</p>;
-  if (!task) return <p className={styles.notFoundMessage}>Task not found</p>;
+  const priorityColors = {
+    1: "#08A508", //Green
+    2: "#FFBE0B", //Yellow
+    3: "#FA4D4D",
+  };
+
+  const departmentColors = {
+    0: "#ff66a8",
+    1: "#89b6ff",
+    2: "#ffd86d",
+    3: "#fd9a6a",
+    4: "#17f1fd",
+    5: "#41ff0c",
+    6: "#e14704",
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return <div className={styles.loading}>იტვირთება...</div>;
+  }
+
+  // Show error message if there was an error
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  // Return null or a placeholder if task is still null after loading
+  if (!task) {
+    return <div className={styles.error}>დავალების ჩატვირთვა ვერ მოხერხდა</div>;
+  }
 
   return (
     <div className={styles.taskContainer}>
@@ -228,37 +238,20 @@ const Task = () => {
         <div className={styles.taskHeader}>
           <div className={styles.taskHeaderTop}>
             <span
-              className={`${
-                task.priority.id === 1
-                  ? styles.priority1
-                  : task.priority.id === 2
-                  ? styles.priority2
-                  : task.priority.id === 3
-                  ? styles.priority3
-                  : ""
-              }`}
+              className={styles.priority}
+              style={{
+                borderColor: priorityColors[task.priority.id],
+                color: priorityColors[task.priority.id],
+              }}
             >
               <img src={task.priority.icon} width="18px" height="20px" />
               {task.priority.name}
             </span>
             <span
-              className={`${
-                task.department.id === 0
-                  ? styles.department0
-                  : task.department.id === 1
-                  ? styles.department1
-                  : task.department.id === 2
-                  ? styles.department2
-                  : task.department.id === 3
-                  ? styles.department3
-                  : task.department.id === 4
-                  ? styles.department4
-                  : task.department.id === 5
-                  ? styles.department5
-                  : task.department.id === 6
-                  ? styles.department6
-                  : ""
-              }`}
+              className={styles.department}
+              style={{
+                backgroundColor: departmentColors[task.department.id],
+              }}
             >
               {task.department.name}
             </span>
@@ -343,95 +336,113 @@ const Task = () => {
         </div>
       </div>
 
-      <div className={styles.commentsSection}>
-        <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            onInput={handleResize}
-            className={styles.commentInput}
-            placeholder="დაწერე კომენტარი"
-          />
-          <button
-            type="submit"
-            disabled={commentLoading}
-            className={styles.commentButton}
-          >
-            დააკომენტარე
-          </button>
-        </form>
-        <span className={styles.commentsTitle}>
-          კომენტარები <span>{comments.length}</span>
-        </span>
-        <div className={styles.commentsList}>
-          {comments.map((comment) => (
-            <div key={comment.id} className={styles.commentItem}>
-
-              <div className={styles.parentComment}>
-              <div className={styles.commentAvatar}>
-                <img
-                  src={comment.author_avatar}
-                  alt="avatar"
-                  className={styles.commentAvatar}
-                />
-              </div>
-              <div className={styles.commentContent}>
-                <p className={styles.commentAuthor}>
-                  {comment.author_nickname}
-                </p>
-                <p className={styles.commentText}>{comment.text}</p>
-                <button
-                  onClick={() =>
-                    setReplyingTo(replyingTo === comment.id ? null : comment.id)
-                  }
-                  className={styles.replyButton}
-                >
-                  <CornerUpLeft size="16px" style={{ marginRight: "6px" }} />
-                  {replyingTo === comment.id ? "გააუქმე პასუხი" : "უპასუხე"}
-                </button>
-              </div>
-              </div>
-              {replyingTo === comment.id && (
-                <div className={styles.replyForm}>
-                  <textarea
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    onInput={handleResize}
-                    className={styles.replyInput}
-                    placeholder="დაწერე პასუხი"
-                  />
-
-                  <button
-                    onClick={() => handleReplySubmit(comment.id)}
-                    disabled={commentLoading}
-                    className={styles.replySubmitButton}
-                  >
-                    უპასუხე
-                  </button>
-                </div>
-              )}
-              
-
-              {comment.sub_comments &&
-                comment.sub_comments.map((subComment) => (
-                  <div key={subComment.id} className={styles.subComment}>
-                    <div className={styles.commentAvatar}>
-                      <img
-                        src={subComment.author_avatar}
-                        alt="avatar"
-                        className={styles.commentAvatar}
-                      />
-                    </div>
-                    <div className={styles.commentContent}>
-                      <p className={styles.commentAuthor}>
-                        {subComment.author_nickname}
-                      </p>
-                      <p className={styles.commentText}>{subComment.text}</p>
-                    </div>
+      <div className={styles.commentsContainer}>
+        <div className={styles.commentsSection}>
+          <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onInput={handleResize}
+              className={styles.commentInput}
+              placeholder="დაწერე კომენტარი"
+            />
+            <button
+              type="submit"
+              disabled={commentLoading}
+              className={styles.commentButton}
+            >
+              დააკომენტარე
+            </button>
+          </form>
+          <span className={styles.commentsTitle}>
+            კომენტარები{" "}
+            <span>
+              {
+                // calculate total comments count (comments+subcomments)
+                (() => {
+                  let count = 0;
+                  comments.forEach((comment) => {
+                    count++;
+                    count += comment.sub_comments.length;
+                  });
+                  return count;
+                })()
+              }
+            </span>
+          </span>
+          <div className={styles.commentsList}>
+            {comments.map((comment) => (
+              <div key={comment.id} className={styles.commentItem}>
+                <div className={styles.parentComment}>
+                  <div className={styles.commentAvatar}>
+                    <img
+                      src={comment.author_avatar}
+                      alt="avatar"
+                      className={styles.commentAvatar}
+                    />
                   </div>
-                ))}
-            </div>
-          ))}
+                  <div className={styles.commentContent}>
+                    <p className={styles.commentAuthor}>
+                      {comment.author_nickname}
+                    </p>
+                    <p className={styles.commentText}>{comment.text}</p>
+                    <button
+                      onClick={() =>
+                        setReplyingTo(
+                          replyingTo === comment.id ? null : comment.id
+                        )
+                      }
+                      className={styles.replyButton}
+                    >
+                      <CornerUpLeft
+                        size="16px"
+                        style={{ marginRight: "6px" }}
+                      />
+                      {replyingTo === comment.id ? "გააუქმე პასუხი" : "უპასუხე"}
+                    </button>
+                  </div>
+                </div>
+                {replyingTo === comment.id && (
+                  <div className={styles.replyForm}>
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      onInput={handleResize}
+                      className={styles.replyInput}
+                      placeholder="დაწერე პასუხი"
+                    />
+
+                    <button
+                      onClick={() => handleReplySubmit(comment.id)}
+                      disabled={commentLoading}
+                      className={styles.replySubmitButton}
+                    >
+                      უპასუხე
+                    </button>
+                  </div>
+                )}
+
+                {comment.sub_comments &&
+                  comment.sub_comments.map((subComment) => (
+                    <div key={subComment.id} className={styles.subComment}>
+                      <div className={styles.commentAvatar}>
+                        <img
+                          src={subComment.author_avatar}
+                          alt="avatar"
+                          className={styles.commentAvatar}
+                        />
+                      </div>
+                      <div className={styles.commentContent}>
+                        <p className={styles.commentAuthor}>
+                          {subComment.author_nickname}
+                        </p>
+                        <p className={styles.commentText}>{subComment.text}</p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

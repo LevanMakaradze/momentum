@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./NewTask.module.css";
-import { Calendar } from "lucide-react";
+import { Calendar, Asterisk } from "lucide-react";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
@@ -315,6 +315,7 @@ const NewTask = ({ submitTask }) => {
 
       setSubmitSuccess(true);
 
+      alert("დავალება წარმატებით დაემატა!");
       // Clear form data from localStorage
       localStorage.removeItem("taskFormData");
 
@@ -419,7 +420,9 @@ const NewTask = ({ submitTask }) => {
           <div className={styles.formInputContainer}>
             <div className={styles.leftColumn}>
               <div className={styles.inputItem}>
-                <label>სათაური*</label>
+                <label>სათაური<Asterisk size={8} style={{
+                                    position:"absolute", top:"0", right:"-8", color:"#343A40"
+                                  }}/></label>
                 <input
                   {...register("title", {
                     required: true,
@@ -478,7 +481,9 @@ const NewTask = ({ submitTask }) => {
               </div>
               <div className={styles.bottomContainer}>
                 <div className={styles.inputItem}>
-                  <label>პრიორიტეტი*</label>
+                  <label>პრიორიტეტი<Asterisk size={8} style={{
+                    position:"absolute", top:"0", right:"-8", color:"#343A40"
+                  }}/></label>
                   <Controller
                     name="priority"
                     control={control}
@@ -508,7 +513,9 @@ const NewTask = ({ submitTask }) => {
                   />
                 </div>
                 <div className={styles.inputItem}>
-                  <label>სტატუსი*</label>
+                  <label>სტატუსი<Asterisk size={8} style={{
+                    position:"absolute", top:"0", right:"-8", color:"#343A40"
+                  }}/></label>
                   <Controller
                     name="status"
                     control={control}
@@ -523,7 +530,9 @@ const NewTask = ({ submitTask }) => {
             <div className={styles.rightColumn}>
               <div className={styles.rightTop}>
                 <div className={styles.inputItem}>
-                  <label>დეპარტამენტი*</label>
+                  <label>დეპარტამენტი<Asterisk size={8} style={{
+                    position:"absolute", top:"0", right:"-8", color:"#343A40"
+                  }}/></label>
                   <Controller
                     name="department"
                     control={control}
@@ -535,7 +544,9 @@ const NewTask = ({ submitTask }) => {
                 </div>
                 {selectedDepartment && (
                   <div className={styles.inputItem}>
-                    <label>პასუხისმგებელი თანამშრომელი*</label>
+                    <label>პასუხისმგებელი თანამშრომელი<Asterisk size={8} style={{
+                    position:"absolute", top:"0", right:"-8", color:"#343A40"
+                  }}/></label>
                     <Controller
                       name="employee"
                       control={control}
