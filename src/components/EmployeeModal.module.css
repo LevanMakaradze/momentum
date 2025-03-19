@@ -16,25 +16,31 @@
   position: relative;
   background-color: white;
   border-radius: 10px;
-  width: 813px;
+  display: flex;
+  flex-direction: column;
+  gap: 37px;
+  margin: 120px auto;
   padding: 40px 50px 60px 50px;
 }
 
 .ModalClose {
-  height: 40px;
+    display: flex;
+    flex-direction: row-reverse;
 }
 
-.ModalClose img {
-  float: right;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  background-color: #212529;
+.ModalForm{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.FormInputs{
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
 }
 
 .ModalTitle {
-  margin-top: 40px;
-  margin-bottom: 40px;
   text-align: center;
 }
 .ModalTitle span {
@@ -51,24 +57,31 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  gap: 45px;
 }
 
 .FormTopInner {
   width: 384px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .ModalContent label {
-  display: block;
-  margin-bottom: 5px;
+  display: inline-block;
+  position: relative;
   font-weight: 500;
   font-size: 14px;
   line-height: 100%;
   letter-spacing: 0%;
+  color: #343A40;
+  width: fit-content;
 }
+
 .FormTopInner input {
   justify-content: space-between;
   width: 100%;
+  box-sizing: border-box;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ced4da;
@@ -77,6 +90,7 @@
 .InputError {
   border: 1px solid #FF3B30 !important;
 }
+
 .ValidationContainer {
   display: flex;
   flex-direction: column;
@@ -117,6 +131,7 @@
   width: 100%;
   height: 120px;
   background: #ffffff;
+  cursor: pointer;
 }
 .PreviewImageBox {
   display: flex;
@@ -171,14 +186,17 @@
 .CustomDropdown {
   position: relative;
   width: 100%;
+  
 }
 
 .DropdownInput {
+  box-sizing: border-box;
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: white;
+  justify-content: space-between;
   cursor: pointer;
 }
 
@@ -228,6 +246,11 @@
   border-radius: 5px;
   border: 1px solid #8338EC;
   background: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.CancelButton:hover{
+  border-color: #B588F4;
 }
 
 .SubmitButton {
@@ -237,7 +260,7 @@
   border: none;
   background: #8338EC;
   color: white;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease-in-out;
 }
 
 .SubmitButton:hover {
@@ -250,3 +273,4 @@
   cursor: not-allowed;
   opacity: 0.7;
 }
+

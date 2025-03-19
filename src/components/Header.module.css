@@ -21,6 +21,9 @@
     font-family: 'Fredoka One', sans-serif;
     font-size: 31px;
     color: #8338EC;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Header menu container */
@@ -29,6 +32,11 @@
     flex-direction: row;
     align-items: center;
     gap: 40px;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+
 }
 
 /* New Employee Button */
