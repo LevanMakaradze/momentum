@@ -6,11 +6,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./NewTask.module.css";
-import { Calendar, Asterisk } from "lucide-react";
+import { Calendar, Asterisk, CirclePlus } from "lucide-react";
+import EmployeeModal from "../components/EmployeeModal";
 
 const API_TOKEN = import.meta.env.VITE_API_TOKEN;
 
-const NewTask = ({ submitTask }) => {
+const NewTask = ({ refreshTrigger }) => {
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   // States for API data
   const [statuses, setStatuses] = useState([]);
   const [priorities, setPriorities] = useState([]);
@@ -248,7 +250,7 @@ const NewTask = ({ submitTask }) => {
     };
 
     fetchEmployees();
-  }, [selectedDepartment, setValue]);
+  }, [selectedDepartment, setValue, refreshTrigger],isEmployeeModalOpen);
 
   // Check form validity
   useEffect(() => {
@@ -384,26 +386,26 @@ const NewTask = ({ submitTask }) => {
 
   const CustomDatePickerInput = ({ value, onClick }) => {
     return (
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: "relative" }}>
         <Calendar
           size={18}
           style={{
-            position: 'absolute',
-            left: '10px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            zIndex: 1,
-            pointerEvents: 'none', // Ensures it doesn't block the input field
+            position: "absolute",
+            left: "10px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            pointerEvents: "none", // Ensures it doesn't block the input field
           }}
         />
         <input
           value={value}
           onClick={onClick}
           style={{
-            padding:'5px 0 5px 35px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
+            padding: "5px 0 5px 35px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
           }}
+          readOnly
         />
       </div>
     );
@@ -420,9 +422,18 @@ const NewTask = ({ submitTask }) => {
           <div className={styles.formInputContainer}>
             <div className={styles.leftColumn}>
               <div className={styles.inputItem}>
-                <label>სათაური<Asterisk size={8} style={{
-                                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                                  }}/></label>
+                <label>
+                  სათაური
+                  <Asterisk
+                    size={8}
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      right: "-8",
+                      color: "#343A40",
+                    }}
+                  />
+                </label>
                 <input
                   {...register("title", {
                     required: true,
@@ -481,9 +492,18 @@ const NewTask = ({ submitTask }) => {
               </div>
               <div className={styles.bottomContainer}>
                 <div className={styles.inputItem}>
-                  <label>პრიორიტეტი<Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/></label>
+                  <label>
+                    პრიორიტეტი
+                    <Asterisk
+                      size={8}
+                      style={{
+                        position: "absolute",
+                        top: "0",
+                        right: "-8",
+                        color: "#343A40",
+                      }}
+                    />
+                  </label>
                   <Controller
                     name="priority"
                     control={control}
@@ -513,9 +533,18 @@ const NewTask = ({ submitTask }) => {
                   />
                 </div>
                 <div className={styles.inputItem}>
-                  <label>სტატუსი<Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/></label>
+                  <label>
+                    სტატუსი
+                    <Asterisk
+                      size={8}
+                      style={{
+                        position: "absolute",
+                        top: "0",
+                        right: "-8",
+                        color: "#343A40",
+                      }}
+                    />
+                  </label>
                   <Controller
                     name="status"
                     control={control}
@@ -530,9 +559,18 @@ const NewTask = ({ submitTask }) => {
             <div className={styles.rightColumn}>
               <div className={styles.rightTop}>
                 <div className={styles.inputItem}>
-                  <label>დეპარტამენტი<Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/></label>
+                  <label>
+                    დეპარტამენტი
+                    <Asterisk
+                      size={8}
+                      style={{
+                        position: "absolute",
+                        top: "0",
+                        right: "-8",
+                        color: "#343A40",
+                      }}
+                    />
+                  </label>
                   <Controller
                     name="department"
                     control={control}
@@ -544,9 +582,18 @@ const NewTask = ({ submitTask }) => {
                 </div>
                 {selectedDepartment && (
                   <div className={styles.inputItem}>
-                    <label>პასუხისმგებელი თანამშრომელი<Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/></label>
+                    <label>
+                      პასუხისმგებელი თანამშრომელი
+                      <Asterisk
+                        size={8}
+                        style={{
+                          position: "absolute",
+                          top: "0",
+                          right: "-8",
+                          color: "#343A40",
+                        }}
+                      />
+                    </label>
                     <Controller
                       name="employee"
                       control={control}
@@ -554,12 +601,40 @@ const NewTask = ({ submitTask }) => {
                       render={({ field }) => (
                         <Select
                           {...field}
-                          options={employees}
+                          options={[
+                            {
+                              value: "add_employee",
+                              label: "დაამატე თანამშრომელი",
+                              isAddEmployee: true,
+                            },
+                            ...employees,
+                          ]}
+                          onChange={(selected) => {
+                            if (selected.isAddEmployee) {
+                              setIsEmployeeModalOpen(true);
+                              return;
+                            }
+                            field.onChange(selected);
+                          }}
                           getOptionLabel={(e) => (
                             <div
-                              style={{ display: "flex", alignItems: "center" }}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                color: e.isAddEmployee ? "#8338EC" : "#0D0F10",
+                                fontWeight: e.isAddEmployee ? "400" : "300",
+                                fontSize: e.isAddEmployee ? "16" : "14",
+                              }}
                             >
-                              {e.avatar && (
+                              {e.isAddEmployee ? (
+                                <CirclePlus
+                                  size={20}
+                                  style={{
+                                    marginRight: "10px",
+                                    color: "#8338EC",
+                                  }}
+                                />
+                              ) : e.avatar ? (
                                 <img
                                   src={e.avatar}
                                   alt="avatar"
@@ -569,16 +644,11 @@ const NewTask = ({ submitTask }) => {
                                     borderRadius: "50%",
                                   }}
                                 />
-                              )}
+                              ) : null}
                               {e.label}
                             </div>
                           )}
-                          placeholder={
-                            employees.length > 0
-                              ? ""
-                              : "თანამშრომლები არ მოიძებნა"
-                          }
-                          isDisabled={employees.length === 0}
+                          placeholder={""}
                         />
                       )}
                     />
@@ -589,28 +659,21 @@ const NewTask = ({ submitTask }) => {
                 <div className={styles.inputItem}>
                   <label>დედლაინი</label>
 
-
                   <Controller
-    name="deadline"
-    control={control}
-    rules={{ required: true }}
-    render={({ field }) => (
-      <DatePicker
-        {...field}
-        selected={field.value}
-        onChange={(date) => setValue('deadline', date)}
-        minDate={new Date()}
-        dateFormat="dd.MM.yyyy"
-        customInput={<CustomDatePickerInput />} // Use custom input component
-      />
-    )}
-  />
-
-
-
-
-
-
+                    name="deadline"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <DatePicker
+                        {...field}
+                        selected={field.value}
+                        onChange={(date) => setValue("deadline", date)}
+                        minDate={new Date()}
+                        dateFormat="dd.MM.yyyy"
+                        customInput={<CustomDatePickerInput />} // Use custom input component
+                      />
+                    )}
+                  />
                 </div>
               </div>
             </div>
@@ -623,6 +686,19 @@ const NewTask = ({ submitTask }) => {
           </div>
         </form>
       </div>
+
+      {isEmployeeModalOpen && (
+  <EmployeeModal 
+    isOpen={true} 
+    onClose={(wasSuccessful) => {
+      setIsEmployeeModalOpen(false);
+    }}
+    onEmployeeAdded={() => {
+      alert("თანამშრომელი წარმატებით დაემატა!");
+      setIsEmployeeModalOpen(false);
+    }}
+  />
+)}
     </>
   );
 };

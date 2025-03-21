@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Styles from "./Header.module.css";
 import { Plus } from "lucide-react";
 import EmployeeModal from "./EmployeeModal"; // Import the EmployeeModal component
 
-function Header() {
+function Header({ onEmployeeAdded }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const handleEmployeeAdded = () => {
+    // Call the parent's callback
+    if (onEmployeeAdded) {
+      onEmployeeAdded();
+    }
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -13,6 +20,7 @@ function Header() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    handleEmployeeAdded();
   };
 
   return (
@@ -70,7 +78,7 @@ function Header() {
       </header>
 
       {/* Employee Modal */}
-      <EmployeeModal isOpen={isModalOpen} onClose={closeModal} />
+      <EmployeeModal isOpen={isModalOpen} onClose={closeModal} onEmployeeAdded={handleEmployeeAdded} />
     </>
   );
 }

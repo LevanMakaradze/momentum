@@ -296,16 +296,15 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
         const data = await response.json();
 
+        onEmployeeAdded();
+        
         // Show success message and close modal
         alert("თანამშრომელი წარმატებით დაემატა!");
 
         // Close the modal with success flag
         handleClose(true);
 
-        // If onEmployeeAdded callback exists, call it with the new employee data
-        if (onEmployeeAdded && typeof onEmployeeAdded === "function") {
-          onEmployeeAdded(data.employee);
-        }
+
       } catch (error) {
         console.error("Error submitting employee data:", error);
         setIsSubmitting(false);

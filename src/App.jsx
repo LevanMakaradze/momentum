@@ -5,8 +5,15 @@ import Dashboard from "./pages/Dashboard";
 import NewTask from "./pages/NewTask";
 import Task from "./pages/Task";
 import "@fontsource/fredoka-one";
-
+import { useState } from "react";
 function App() {
+  const [employeeRefreshTrigger, setEmployeeRefreshTrigger] = useState(0);
+
+  // Function to handle employee added
+  const handleEmployeeAdded = () => {
+    setEmployeeRefreshTrigger((prev) => prev + 1);
+  };
+
   return (
     <BrowserRouter basename="/momentum/">
       <Routes>
@@ -14,8 +21,8 @@ function App() {
           path="/"
           element={
             <>
-              <Header />
-              <Dashboard />
+              <Header onEmployeeAdded={handleEmployeeAdded}  />
+              <Dashboard refreshTrigger={employeeRefreshTrigger} />
             </>
           }
         />
@@ -23,8 +30,8 @@ function App() {
           path="/NewTask"
           element={
             <>
-              <Header />
-              <NewTask />
+              <Header onEmployeeAdded={handleEmployeeAdded} />
+              <NewTask refreshTrigger={employeeRefreshTrigger}/>
             </>
           }
         />
@@ -32,11 +39,11 @@ function App() {
           path="/Task/:taskId"
           element={
             <>
-              <Header />
+              <Header onEmployeeAdded={handleEmployeeAdded} />
               <Task />
             </>
           }
-          />
+        />
       </Routes>
     </BrowserRouter>
   );
