@@ -104,49 +104,66 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
     validateForm();
   }, [inputData, imageFile, selectedDepartment]);
 
-  // Validate the entire form
   const validateForm = () => {
     const errors = {};
     let isValid = true;
 
-    // Validate name (min 2 chars, max 255 chars, only Georgian or Latin alphabet)
+    // Validate name
     if (!inputData.name) {
       errors.name = "სახელი აუცილებელია";
       isValid = false;
-    } else if (inputData.name.length < 2) {
-      errors.name = "მინიმუმ 2 სიმბოლო";
-      isValid = false;
-    } else if (inputData.name.length > 255) {
-      errors.name = "მაქსიმუმ 255 სიმბოლო";
-      isValid = false;
-    } else if (!/^[a-zA-Zა-ჰ\s]+$/.test(inputData.name)) {
-      errors.name = "მხოლოდ ქართული ან ლათინური სიმბოლოები";
-      isValid = false;
+    } else {
+      // Check min length
+      if (inputData.name.length < 2) {
+        errors.name = "მინიმუმ 2 სიმბოლო";
+        isValid = false;
+      }
+      // Check max length
+      if (inputData.name.length > 255) {
+        errors.name = "მაქსიმუმ 255 სიმბოლო";
+        isValid = false;
+      }
+      // Check format
+      if (!/^[a-zA-Zა-ჰ\s]+$/.test(inputData.name)) {
+        errors.name = "მხოლოდ ქართული ან ლათინური სიმბოლოები";
+        isValid = false;
+      }
     }
 
-    // Validate surname (min 2 chars, max 255 chars, only Georgian or Latin alphabet)
+    // Validate surname with similar independent checks
     if (!inputData.surname) {
       errors.surname = "გვარი აუცილებელია";
       isValid = false;
-    } else if (inputData.surname.length < 2) {
-      errors.surname = "მინიმუმ 2 სიმბოლო";
-      isValid = false;
-    } else if (inputData.surname.length > 255) {
-      errors.surname = "მაქსიმუმ 255 სიმბოლო";
-      isValid = false;
-    } else if (!/^[a-zA-Zა-ჰ\s]+$/.test(inputData.surname)) {
-      errors.surname = "მხოლოდ ქართული ან ლათინური სიმბოლოები";
-      isValid = false;
+    } else {
+      if (inputData.surname.length < 2) {
+        errors.surname = "მინიმუმ 2 სიმბოლო";
+        isValid = false;
+      }
+      if (inputData.surname.length > 255) {
+        errors.surname = "მაქსიმუმ 255 სიმბოლო";
+        isValid = false;
+      }
+      if (!/^[a-zA-Zა-ჰ\s]+$/.test(inputData.surname)) {
+        errors.surname = "მხოლოდ ქართული ან ლათინური სიმბოლოები";
+        isValid = false;
+      }
     }
 
     // Validate avatar
     if (!imageFile) {
       errors.avatar = "ავატარი აუცილებელია";
       isValid = false;
-    } else if (imageFile.size > 600 * 1024) {
-      // 600KB
-      errors.avatar = "მაქსიმუმ 600კბ";
-      isValid = false;
+    } else {
+      // Check file size
+      if (imageFile.size > 600 * 1024) {
+        errors.avatar = "მაქსიმუმ 600კბ";
+        isValid = false;
+      }
+      // Check file type
+      if (!imageFile.type.startsWith("image/")) {
+        errors.avatar = "ავატარი უნდა იყოს სურათის ტიპის";
+        isValid = false;
+      }
     }
 
     // Validate department
@@ -175,26 +192,33 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
   const handleImageUpload = (e) => {
     if (isSubmitting) return;
-    
+
     const file = e.target.files[0];
     if (file) {
+      // Check file size
       if (file.size > 600 * 1024) {
-        alert("ავატარის ზომა მაქსიმუმ 600კბ!");
         setFormErrors({ ...formErrors, avatar: "მაქსიმუმ 600კბ" });
-      } else {
+      }
+      // Check file type
+      else if (!file.type.startsWith("image/")) {
+        setFormErrors({
+          ...formErrors,
+          avatar: "ავატარი უნდა იყოს სურათის ტიპის",
+        });
+      } 
         setFormErrors({ ...formErrors, avatar: null });
         const imageUrl = URL.createObjectURL(file);
         setImagePreview(imageUrl);
         setImageFile(file);
         setFormTouched({ ...formTouched, avatar: true });
         setInputData({ ...inputData, avatar: file });
-      }
+      
     }
   };
 
   const removeImagePreview = () => {
     if (isSubmitting) return;
-    
+
     setImagePreview(null);
     setImageFile(null);
     setInputData({ ...inputData, avatar: null });
@@ -204,14 +228,14 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
   const toggleDropdown = () => {
     if (isSubmitting) return;
-    
+
     setIsDropdownOpen(!isDropdownOpen);
     setFormTouched({ ...formTouched, department: true });
   };
 
   const selectDepartment = (departmentName, departmentId) => {
     if (isSubmitting) return;
-    
+
     setSelectedDepartment(departmentName);
     setInputData({ ...inputData, department: departmentId });
     setIsDropdownOpen(false);
@@ -221,7 +245,7 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
   const handleInputChange = (e) => {
     if (isSubmitting) return;
-    
+
     const { name, value } = e.target;
     setInputData({ ...inputData, [name]: value });
     setFormTouched({ ...formTouched, [name]: true });
@@ -229,7 +253,7 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (isSubmitting) return;
 
     // Mark all fields as touched
@@ -245,58 +269,91 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
 
     if (formValid) {
       setIsSubmitting(true);
-      
+
       try {
         // Create FormData object for multipart/form-data
         const formData = new FormData();
-        formData.append('name', inputData.name);
-        formData.append('surname', inputData.surname);
-        formData.append('avatar', imageFile);
-        formData.append('department_id', inputData.department);
+        formData.append("name", inputData.name);
+        formData.append("surname", inputData.surname);
+        formData.append("avatar", imageFile);
+        formData.append("department_id", inputData.department);
 
         // Make the POST request
-        const response = await fetch('https://momentum.redberryinternship.ge/api/employees', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${API_TOKEN}`
-          },
-          body: formData
-        });
+        const response = await fetch(
+          "https://momentum.redberryinternship.ge/api/employees",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+            },
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
         }
 
         const data = await response.json();
-        
+
         // Show success message and close modal
         alert("თანამშრომელი წარმატებით დაემატა!");
-        
+
         // Close the modal with success flag
         handleClose(true);
-        
+
         // If onEmployeeAdded callback exists, call it with the new employee data
-        if (onEmployeeAdded && typeof onEmployeeAdded === 'function') {
+        if (onEmployeeAdded && typeof onEmployeeAdded === "function") {
           onEmployeeAdded(data.employee);
         }
       } catch (error) {
-        console.error('Error submitting employee data:', error);
+        console.error("Error submitting employee data:", error);
         setIsSubmitting(false);
       }
     }
   };
 
-  // Function to determine validation message color
-  const getValidationMessageColor = (fieldName) => {
-    if (formErrors[fieldName] && formTouched[fieldName]) {
-      return styles.ValidationError;
-    } else if (formTouched[fieldName] && !formErrors[fieldName]) {
-      return styles.ValidationSuccess;
-    } else {
-      return styles.ValidationDefault;
+  // Function to determine validation message color for each individual validation rule
+  const getValidationMessageColor = (fieldName, validationType) => {
+    if (validationType === "min") {
+      if (!inputData[fieldName]) return styles.ValidationDefault;
+      return inputData[fieldName].length >= 2
+        ? styles.ValidationSuccess
+        : styles.ValidationError;
     }
+
+    if (validationType === "max") {
+      if (!inputData[fieldName]) return styles.ValidationDefault;
+      return inputData[fieldName].length <= 255
+        ? styles.ValidationSuccess
+        : styles.ValidationError;
+    }
+
+    if (validationType === "format") {
+      if (!inputData[fieldName]) return styles.ValidationDefault;
+      return /^[a-zA-Zა-ჰ\s]+$/.test(inputData[fieldName])
+        ? styles.ValidationSuccess
+        : styles.ValidationError;
+    }
+
+    if (fieldName === "avatar") {
+      if (validationType === "type") {
+        if (!imageFile) return styles.ValidationDefault;
+        return imageFile.type.startsWith("image/")
+          ? styles.ValidationSuccess
+          : styles.ValidationError;
+      }
+      if (validationType === "size") {
+        if (!imageFile) return styles.ValidationDefault;
+        return imageFile.size <= 600 * 1024
+          ? styles.ValidationSuccess
+          : styles.ValidationError;
+      }
+    }
+
+    return styles.ValidationDefault;
   };
-  
+
   // Function to determine input border style
   const getInputBorderStyle = (fieldName) => {
     if (formErrors[fieldName] && formTouched[fieldName]) {
@@ -313,9 +370,13 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
     <div className={styles.ModalOverlay} onClick={handleOutsideClick}>
       <div className={styles.ModalContent} ref={modalRef}>
         <div className={styles.ModalClose}>
-          <CircleX size={40} onClick={() => handleClose()} style={{cursor: "pointer"}}/>
+          <CircleX
+            size={40}
+            onClick={() => handleClose()}
+            style={{ cursor: "pointer" }}
+          />
         </div>
-        
+
         {/* Employee creation form */}
         <form onSubmit={handleSubmit} className={styles.ModalForm}>
           <div className={styles.ModalTitle}>
@@ -324,10 +385,17 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
           <div className={styles.FormInputs}>
             <div className={styles.FormTop}>
               <div className={styles.FormTopInner}>
-                <label>სახელი
-                  <Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/>
+                <label>
+                  სახელი
+                  <Asterisk
+                    size={8}
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      right: "-8",
+                      color: "#343A40",
+                    }}
+                  />
                 </label>
                 <input
                   type="text"
@@ -339,14 +407,14 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
                   disabled={isSubmitting}
                 />
                 <div className={styles.ValidationContainer}>
-                  <div className={getValidationMessageColor("name")}>
+                  <div className={getValidationMessageColor("name", "min")}>
                     <span>
                       <Check size={"16px"} />
                       მინიმუმ 2 სიმბოლო
                     </span>
                   </div>
 
-                  <div className={getValidationMessageColor("name")}>
+                  <div className={getValidationMessageColor("name", "max")}>
                     <span>
                       <Check size={"16px"} />
                       მაქსიმუმ 255 სიმბოლო
@@ -356,29 +424,38 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
               </div>
 
               <div className={styles.FormTopInner}>
-                <label>გვარი
-                  <Asterisk size={8} style={{
-                    position:"absolute", top:"0", right:"-8", color:"#343A40"
-                  }}/>
+                <label>
+                  გვარი
+                  <Asterisk
+                    size={8}
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      right: "-8",
+                      color: "#343A40",
+                    }}
+                  />
                 </label>
                 <input
                   type="text"
                   name="surname"
                   value={inputData.surname}
                   onChange={handleInputChange}
-                  onBlur={() => setFormTouched({ ...formTouched, surname: true })}
+                  onBlur={() =>
+                    setFormTouched({ ...formTouched, surname: true })
+                  }
                   className={getInputBorderStyle("surname")}
                   disabled={isSubmitting}
                 />
                 <div className={styles.ValidationContainer}>
-                  <div className={getValidationMessageColor("surname")}>
+                  <div className={getValidationMessageColor("surname", "min")}>
                     <span>
                       <Check size={"16px"} />
                       მინიმუმ 2 სიმბოლო
                     </span>
                   </div>
 
-                  <div className={getValidationMessageColor("surname")}>
+                  <div className={getValidationMessageColor("surname", "max")}>
                     <span>
                       <Check size={"16px"} />
                       მაქსიმუმ 255 სიმბოლო
@@ -389,10 +466,17 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
             </div>
 
             <div>
-              <label>ავატარი
-                <Asterisk size={8} style={{
-                  position:"absolute", top:"0", right:"-8", color:"#343A40"
-                }}/>
+              <label>
+                ავატარი
+                <Asterisk
+                  size={8}
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "-8",
+                    color: "#343A40",
+                  }}
+                />
               </label>
               {!imagePreview ? (
                 <div>
@@ -406,7 +490,11 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
                     disabled={isSubmitting}
                   >
                     <div className={styles.PreviewImageBox}>
-                      <img src={AvatarIcon} style={{ width: "24px" }} alt="Upload avatar"/>
+                      <img
+                        src={AvatarIcon}
+                        style={{ width: "24px" }}
+                        alt="Upload avatar"
+                      />
                       <span>ატვირთე ფოტო</span>
                     </div>
                   </button>
@@ -434,18 +522,44 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
                       src={TrashIcon}
                       alt="Remove"
                       onClick={removeImagePreview}
-                      style={{cursor: isSubmitting ? "default" : "pointer"}}
+                      style={{ cursor: isSubmitting ? "default" : "pointer" }}
                     />
                   </div>
                 </div>
               )}
+                                <div className={styles.ValidationContainer}>
+                    <div
+                      className={getValidationMessageColor("avatar", "type")}
+                    >
+                      <span>
+                        <Check size={"16px"} />
+                        სურათის ტიპი
+                      </span>
+                    </div>
+
+                    <div
+                      className={getValidationMessageColor("avatar", "size")}
+                    >
+                      <span>
+                        <Check size={"16px"} />
+                        მაქსიმუმ 600kb
+                      </span>
+                    </div>
+                  </div>
             </div>
 
             <div className={styles.SelectableInputContainer}>
-              <label>დეპარტამენტი
-                <Asterisk size={8} style={{
-                  position:"absolute", top:"0", right:"-8", color:"#343A40"
-                }}/>
+              <label>
+                დეპარტამენტი
+                <Asterisk
+                  size={8}
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    right: "-8",
+                    color: "#343A40",
+                  }}
+                />
               </label>
               <div className={styles.CustomDropdown}>
                 <input
@@ -454,7 +568,9 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
                   value={selectedDepartment}
                   onClick={toggleDropdown}
                   readOnly
-                  className={`${styles.DropdownInput} ${getInputBorderStyle("department")}`}
+                  className={`${styles.DropdownInput} ${getInputBorderStyle(
+                    "department"
+                  )}`}
                   disabled={isSubmitting}
                 />
                 <div className={styles.DropdownArrow}>
@@ -481,7 +597,6 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
                 )}
               </div>
             </div>
-            
           </div>
           <div className={styles.FormButtons}>
             <button
@@ -494,10 +609,12 @@ function EmployeeModal({ isOpen, onClose, onEmployeeAdded }) {
             </button>
             <button
               type="submit"
-              className={`${styles.SubmitButton} ${!formValid ? styles.SubmitButtonDisabled : ''}`}
+              className={`${styles.SubmitButton} ${
+                !formValid ? styles.SubmitButtonDisabled : ""
+              }`}
               disabled={!formValid || isSubmitting}
             >
-              {isSubmitting ? 'იტვირთება...' : 'დაამატე თანამშრომელი'}
+              {isSubmitting ? "იტვირთება..." : "დაამატე თანამშრომელი"}
             </button>
           </div>
         </form>

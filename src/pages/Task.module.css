@@ -166,7 +166,6 @@
     margin-top: 60px;
     padding: 40px 45px;
     width: 740px;
-    height: 975px;
   }
   
   .commentForm {
@@ -243,11 +242,15 @@
   
   .commentsList {
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: 20px;
-    overflow-y: auto;
   }
   
+  .subCommentList{
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
   .commentItem {
     display: flex;
     flex-direction: column;

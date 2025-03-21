@@ -421,7 +421,7 @@ const Task = () => {
                     </button>
                   </div>
                 )}
-
+                <div className={styles.subCommentList}>
                 {comment.sub_comments &&
                   comment.sub_comments.map((subComment) => (
                     <div key={subComment.id} className={styles.subComment}>
@@ -440,6 +440,7 @@ const Task = () => {
                       </div>
                     </div>
                   ))}
+                  </div>
               </div>
             ))}
           </div>
